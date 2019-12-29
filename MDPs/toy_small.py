@@ -13,3 +13,7 @@ class MDPToySmall:
         
         self.r = torch.zeros(self.n_states, 1)
         self.r[-1, 0] = 1
+    
+    def cuda(self):
+        self.P = self.P.cuda()
+        self.r = self.r.cuda()
