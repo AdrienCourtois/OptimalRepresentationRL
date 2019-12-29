@@ -21,3 +21,5 @@ class MDPToySmall:
 
         self.P = self.P.cuda()
         self.r = self.r.cuda()
+
+        return self
