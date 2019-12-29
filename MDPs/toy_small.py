@@ -1,6 +1,6 @@
 import torch
 
-class MDP:
+class MDPToySmall:
     def __init__(self):
         self.n_actions = 4
         self.n_states = 10
