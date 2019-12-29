@@ -2,6 +2,8 @@ import torch
 import numpy as np
 import pickle
 
+from models.AVFPolicy import AVFPolicy
+
 class AVFManager:
     def __init__(self, MDP):
         self.MDP = MDP
