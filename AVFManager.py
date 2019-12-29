@@ -248,10 +248,10 @@ class AVFManager:
     def __getitem__(self, idx):
         # Returns the asked AVF
 
-        if idx >= len(self.AVFs):
-            raise "Index error, tried to access element idx " + str(idx) + "/" + str(len(self.AVFs))
-
         return self.AVFs[idx]
+    
+    def __len__(self):
+        return len(self.AVFs)
     
     def score(self, idx):
         # Returns the score of the AVF number `idx`
