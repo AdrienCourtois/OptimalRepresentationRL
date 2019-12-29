@@ -7,6 +7,11 @@ class AVFManager:
         self.MDP = MDP
         self.AVFs = []
         self.deltas = torch.from_numpy(np.array([])).float()
+
+        self.is_cuda = MDP.is_cuda
+
+        if self.is_cuda:
+            self.deltas = self.deltas.cuda().float()
     
 
     ###############
@@ -14,6 +19,10 @@ class AVFManager:
     ###############
     def onehot_state(self, x):
         s = torch.zeros(self.MDP.n_states)
+
+        if x.is_cuda:
+            s = s.cuda()
+        
         s[x] = 1
 
         return s
@@ -24,6 +33,9 @@ class AVFManager:
         # probabilistic: pi must be in the format X -> P(A)
 
         P = torch.zeros(self.MDP.n_states, self.MDP.n_states)
+
+        if self.is_cuda:
+            P = P.cuda()
 
         if len(pi.size()) == 1: # deterministic
             for x in range(self.MDP.n_states):
@@ -40,8 +52,14 @@ class AVFManager:
         # probabilistic: pi must be in the format X -> P(A)
 
         P = self.compute_P(pi)
-        mat = torch.eye(self.MDP.n_states) - self.MDP.gamma * P
+        e = torch.eye(self.MDP.n_states)
+
+        if pi.is_cuda:
+            e = e.cuda()
+        
+        mat = e - self.MDP.gamma * P
         mat = mat.inverse()
+
         V = torch.mm(mat, self.MDP.r)
 
         return V
@@ -64,17 +82,27 @@ class AVFManager:
     def GradientBasedAVF(self, delta, niter=1000):
         # Implementation of Algorithm 1 to compute an AVF given a direction delta
         # using a gradient-based policy-learning algorithm.
+        #
+        # TIMING:
         # Around 1s on CPU for default params.
+        # Around 5.7s on GPU for default params.
+        #
+        # PARAMS:
         # delta: Direction in R^n where n=n_states
         # Returns a deterministic policy
 
         pi = AVFPolicy(self.MDP)
+        e = torch.eye(self.MDP.n_states)
+
+        if self.is_cuda:
+            pi = pi.cuda()
+            e = e.cuda()
 
         for i in range(niter):
             # Compute P
             P = self.compute_P(pi.get_policy())
             
-            mat = torch.eye(self.MDP.n_states) - self.MDP.gamma * P
+            mat = e - self.MDP.gamma * P
             mat = mat.inverse()
 
             # Compute loss
@@ -93,6 +121,7 @@ class AVFManager:
     ###############
 
     def PolicyBasedAVF(self, delta, niter=1000, piter=100):
+        # Note: Not CUDA compatible
         # Policy based algorithm used to compute the AVF.
         # It is really slow in practise and does not always find a good result.
         # delta: Direction in R^n where n=n_states
@@ -146,6 +175,7 @@ class AVFManager:
     ###############
 
     def NaiveAVF(self, delta, verbose=False):
+        # Note: Not CONDA comptatible
         # WARNING: This algorithm is extremely computationaly expensive
         # ONLY use it for very little MDP
         # delta: Direction in R_n where n=n_states
@@ -203,7 +233,12 @@ class AVFManager:
         
         
         n = len(self.deltas)
-        self.deltas = torch.cat((self.deltas, torch.rand(k, self.MDP.n_states, 1, dtype=torch.float)))
+        new_delta = torch.rand(k, self.MDP.n_states, 1, dtype=torch.float)
+
+        if self.is_cuda:
+            new_delta = new_delta.cuda()
+
+        self.deltas = torch.cat((self.deltas, new_delta))
         
         for i in range(n,n+k):
             self.AVFs.append(algo(self.deltas[i], **kargs))
