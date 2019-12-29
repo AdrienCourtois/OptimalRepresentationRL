@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+import pickle
 
 class AVFManager:
     def __init__(self, MDP):
@@ -91,7 +92,7 @@ class AVFManager:
     # ALGORITHM 2 #
     ###############
 
-    def PolicyBasedAVF(delta, niter=1000, piter=100):
+    def PolicyBasedAVF(self, delta, niter=1000, piter=100):
         # Policy based algorithm used to compute the AVF.
         # It is really slow in practise and does not always find a good result.
         # delta: Direction in R^n where n=n_states
@@ -219,3 +220,16 @@ class AVFManager:
         # Returns the score of the AVF number `idx`
 
         return self.scoreAVF(self.deltas[idx], self.AVFs[idx])
+    
+    #######
+    # I/O #
+    #######
+
+    def save(self, file_name):
+        with open(file_name, 'wb') as file:
+            pickle.dump(self, file)
+
+    @staticmethod
+    def load(file_name):
+        with open(file_name, 'rb') as file:
+            return pickle.load(file)
