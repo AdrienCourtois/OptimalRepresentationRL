@@ -80,7 +80,7 @@ class MDPTwoRoom:
         reward = self.R[self.state, action, next_state]
 
         # Checking if it is done
-        done = next_state == self.end_state or next_state in self.forbidden_states or next_state == self.dump_state or self nb_actions >= 200
+        done = next_state == self.end_state or next_state in self.forbidden_states or next_state == self.dump_state or self.nb_actions >= 200
 
         # Internal updates
         self.state = next_state
