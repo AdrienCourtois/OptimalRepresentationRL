@@ -64,6 +64,7 @@ class MDPTwoRoom:
 
         # transition
         self.state = self.begin_state
+        self.nb_actions = 0
         
         self.is_cuda = False
     
@@ -79,10 +80,12 @@ class MDPTwoRoom:
         reward = self.R[self.state, action, next_state]
 
         # Checking if it is done
-        done = next_state == self.end_state or next_state in self.forbidden_states or next_state == self.dump_state
+        done = next_state == self.end_state or next_state in self.forbidden_states or next_state == self.dump_state or self nb_actions >= 200
 
         # Internal updates
         self.state = next_state
+        self.nb_actions += 1
+
         if done:
             self.reset()
         
@@ -93,6 +96,8 @@ class MDPTwoRoom:
             self.state = self.begin_state
         else:
             self.state = s
+        
+        self.nb_actions = 0
         
         return self.state
     
