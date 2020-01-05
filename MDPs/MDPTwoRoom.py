@@ -57,6 +57,7 @@ class MDPTwoRoom:
         # R definition
         self.R = np.zeros(self.P.shape)
         self.R[:,:,self.end_state] = 1
+        self.R[:,:,22] = 0.5
         
         self.r = torch.from_numpy(self.R.mean(axis=0).mean(axis=0))
         self.r = self.r.view(-1, 1).float()
