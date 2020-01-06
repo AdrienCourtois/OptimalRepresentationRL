@@ -29,6 +29,7 @@ class MDPTwoRoom:
 
         # P definition
         self.P = np.zeros((self.n_states, self.n_actions, self.n_states))
+        self.R = np.zeros(self.P.shape)
 
         for s in range(self.n_states):
             self.P[s,0,(s-1) % self.n_states] = 1
@@ -36,26 +37,30 @@ class MDPTwoRoom:
             self.P[s,2,(s-self.n_cols) % self.n_states] = 1
             self.P[s,3,(s+self.n_cols) % self.n_states] = 1
         
+        # Out of bound
         for x in [0, 9, 18, 27, 36]:
             self.P[x,0,:] = 0
             self.P[x,0,self.dump_state] = 1
+            self.R[x,0,:] = -1
         
         for x in [8, 17, 26, 35, 44]:
             self.P[x,1,:] = 0
             self.P[x,1,self.dump_state] = 1
+            self.R[x,1,:] = -1
 
         for x in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]:
             self.P[x,2,:] = 0
             self.P[x,2,self.dump_state] = 1
+            self.R[x,2,:] = -1
         
         for x in [36, 37, 38, 39, 40, 41, 42, 43, 44]:
             self.P[x,3,:] = 0
             self.P[x,3,self.dump_state] = 1
+            self.R[x,3,:] = -1
         
         self.P = torch.from_numpy(self.P).float()
         
         # R definition
-        self.R = np.zeros(self.P.shape)
         self.R[43,1,:] = 1 # qd tu vas à droite à partir de la case 43, c'est bien
         self.R[35,3,:] = 1 # qd tu vas en bas à partir de la case 35 c'est bien
         #self.R[:,:,22] = 0.5 # not good, loops around the door
