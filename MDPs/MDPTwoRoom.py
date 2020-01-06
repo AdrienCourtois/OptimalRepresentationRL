@@ -64,8 +64,6 @@ class MDPTwoRoom:
 
         self.P[self.end_state] = np.zeros((self.n_actions, self.n_states))
         self.P[self.end_state,:,self.end_state] = 1
-
-        self.R[self.dump_state,:,:] = -1
         
         # R definition
         self.R[43,1,:] = 1 # qd tu vas à droite à partir de la case 43, c'est bien
