@@ -58,12 +58,17 @@ class MDPTwoRoom:
             self.P[x,3,self.dump_state] = 1
             self.R[x,3,:] = -1
         
-        self.P = torch.from_numpy(self.P).float()
+        # Dump
+        self.P[self.dump_state] = np.zeros((self.n_actions, self.n_states))
+        self.P[self.dump_state,:,self.dump_state] = 1
+        self.R[self.dump_state,:,:] = -1
         
         # R definition
         self.R[43,1,:] = 1 # qd tu vas à droite à partir de la case 43, c'est bien
         self.R[35,3,:] = 1 # qd tu vas en bas à partir de la case 35 c'est bien
         #self.R[:,:,22] = 0.5 # not good, loops around the door
+        
+        self.P = torch.from_numpy(self.P).float()
         
         self.r = torch.from_numpy(self.R.mean(axis=0).mean(axis=0))
         self.r = self.r.view(-1, 1).float()
