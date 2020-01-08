@@ -1,6 +1,6 @@
 import torch
 
-def compute_V_optimal(MDP, niter=10000):
+def get_optimal_V(MDP, niter=10000):
     r = torch.from_numpy(MDP.R).mean(2)
     V = torch.rand(MDP.n_states)
     gamma = MDP.gamma
