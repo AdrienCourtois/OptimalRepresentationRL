@@ -235,7 +235,7 @@ class AVFManager:
         
         
         n = len(self.deltas)
-        new_delta = torch.rand(k, self.MDP.n_states, 1, dtype=torch.float)
+        new_delta = 2 * torch.rand(k, self.MDP.n_states, 1, dtype=torch.float) - 1
 
         if self.is_cuda:
             new_delta = new_delta.cuda()
