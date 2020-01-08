@@ -25,7 +25,7 @@ def evaluate_V(V, MDP, max_iter=2000, random=False, render=False):
         nb += 1
 
         if nb >= max_iter:
-            error = True
+            error = 1
             break
         
         if render:
