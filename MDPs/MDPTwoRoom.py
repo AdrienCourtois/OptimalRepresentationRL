@@ -150,7 +150,7 @@ class MDPTwoRoom:
             
             error, reward = evaluate_V(V, self, state_start=i)
 
-            nb_error += error
+            nb_errors += error
             rewards.append(reward)
         
-        return nb_error, rewards
+        return nb_errors, rewards
