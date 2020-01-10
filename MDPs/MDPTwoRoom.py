@@ -41,22 +41,22 @@ class MDPTwoRoom:
         for x in [0, 5, 9, 14, 18, 27, 32, 36, 41]:
             self.P[x,0,:] = 0
             self.P[x,0,self.dump_state] = 1
-            self.R[x,0,:] = -1
+            #self.R[x,0,:] = -1
         
         for x in [3, 8, 12, 17, 26, 30, 35, 39, 44]:
             self.P[x,1,:] = 0
             self.P[x,1,self.dump_state] = 1
-            self.R[x,1,:] = -1
+            #self.R[x,1,:] = -1
 
         for x in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 22]:
             self.P[x,2,:] = 0
             self.P[x,2,self.dump_state] = 1
-            self.R[x,2,:] = -1
+            #self.R[x,2,:] = -1
         
         for x in [22, 36, 37, 38, 39, 40, 41, 42, 43, 44]:
             self.P[x,3,:] = 0
             self.P[x,3,self.dump_state] = 1
-            self.R[x,3,:] = -1
+            #self.R[x,3,:] = -1
         
         # Dump
         self.P[self.dump_state] = np.zeros((self.n_actions, self.n_states))
