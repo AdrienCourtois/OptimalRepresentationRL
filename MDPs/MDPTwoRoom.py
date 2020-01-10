@@ -1,6 +1,7 @@
 import torch
 import numpy as np
 import sys
+from utils.evaluate_V import evaluate_V
 
 class MDPTwoRoom:
     def __init__(self):
@@ -138,3 +139,18 @@ class MDPTwoRoom:
         self.r = self.r.cuda()
 
         return self
+    
+    def evaluate(self, V):
+        rewards = []
+        nb_errors = 0
+
+        for i in range(self.n_states):
+            if i in self.forbidden_states or i == self.dump_state:
+                continue
+            
+            error, reward = evaluate_V(V, self, state_start=i)
+
+            nb_error += error
+            rewards.append(reward)
+        
+        return nb_error, rewards
