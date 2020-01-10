@@ -74,6 +74,7 @@ class MDPFourRoom:
         # R definition
         self.R[23,1,:] = 1 # qd tu vas à droite à partir de la case 23, c'est bien
         self.R[37,2,:] = 1 # qd tu vas en haut à partir de la case 37 c'est bien
+        self.R[self.end_state,:,self.end_state] = 1
         
         self.P = torch.from_numpy(self.P).float()
         
