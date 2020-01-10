@@ -120,8 +120,8 @@ wwwwwwwwwwwww
         for x in range(self.n_states):
             for a in range(self.n_actions):
                 if self.P[x,a].argmax() in self.forbidden_states:
-                    P[x,a,P[x,a].argmax()] = 0
-                    P[x,a,x] = 1
+                    self.P[x,a,self.P[x,a].argmax()] = 0
+                    self.P[x,a,x] = 1
         
         # R definition
         self.R[23,1,:] = 1 # qd tu vas à droite à partir de la case 23, c'est bien
