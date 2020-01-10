@@ -3,6 +3,37 @@ import numpy as np
 import sys
 from utils.evaluate_V import evaluate_V
 
+def make_adjacency(layout):
+    """Convert a grid world layout to an adjacency matrix.
+    Args:
+        layout (np.ndarray): Grid layout as an array where 0 means a wall and 1 is empty.
+    Returns:
+        tuple: First element is aulti-dimensional np.ndarray of size (A X S X S) where A=4 is the 
+        number of actions, and S is the number of states. The action set is: 
+        UP (0), DOWN (1), LEFT (2), RIGHT (3). The second element of the tuple is a np.ndarray
+        mapping state (integer) to cell coordinates in the original layout.
+    """
+    directions = [np.array((-1, 0)),  # UP
+                  np.array((1, 0)),  # DOWN
+                  np.array((0, -1)),  # LEFT
+                  np.array((0, 1))]  # RIGHT
+
+    grid = np.array([list(map(lambda c: 0 if c == 'w' else 1, line)) for line in layout.splitlines()])
+    state_to_grid_cell = np.argwhere(grid)
+    grid_cell_to_state = {tuple(state_to_grid_cell[s].tolist()): s
+                          for s in range(state_to_grid_cell.shape[0])}
+
+    nstates = state_to_grid_cell.shape[0]
+    nactions = len(directions)
+    P = np.zeros((nactions, nstates, nstates))
+    for state, idx in enumerate(state_to_grid_cell):
+        for action, d in enumerate(directions):
+            if grid[tuple(idx + d)]:
+                dest_state = grid_cell_to_state[tuple(idx + d)]
+                P[action, state, dest_state] = 1.
+
+    return P, state_to_grid_cell
+
 class MDPFourRoom:
     def __init__(self):
         # (000) (001) (002) (003) (004) (005) (006) (007) (008) (009) (010) (011) (012)
@@ -34,6 +65,20 @@ class MDPFourRoom:
             ["x", "S", " ", " ", " ", " ", "x", " ", " ", " ", " ", " ", "x"],
             ["x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x", "x"]])
 
+        self.layout = """wwwwwwwwwwwww
+w     w     w
+w     w     w
+w           w
+w     w     w
+w     w     w
+ww wwww     w
+w     www www
+w     w     w
+w     w     w
+w           w
+w     w     w
+wwwwwwwwwwwww
+"""
         self.n_rows = 13
         self.n_cols = 13
         self.begin_state = 144
@@ -70,11 +115,17 @@ class MDPFourRoom:
         # End
         self.P[self.end_state] = np.zeros((self.n_actions, self.n_states))
         self.P[self.end_state,:,self.end_state] = 1
+
+        # In a wall probability -> stay in place
+        for x in range(self.n_states):
+            for a in range(self.n_actions):
+                if self.P[x,a].argmax() in self.forbidden_states:
+                    P[x,a,P[x,a].argmax()] = 0
+                    P[x,a,x] = 1
         
         # R definition
         self.R[23,1,:] = 1 # qd tu vas à droite à partir de la case 23, c'est bien
         self.R[37,2,:] = 1 # qd tu vas en haut à partir de la case 37 c'est bien
-        self.R[self.end_state,:,self.end_state] = 1
         
         self.P = torch.from_numpy(self.P).float()
         
