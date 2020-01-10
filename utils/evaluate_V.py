@@ -1,6 +1,6 @@
 import torch
 
-def evaluate_V(V, MDP, max_iter=2000, random=False, render=False):
+def evaluate_V(V, MDP, state_start=None, max_iter=2000, random=False, render=False):
     r = torch.from_numpy(MDP.R).mean(2)
 
     # Compute policy
@@ -9,7 +9,7 @@ def evaluate_V(V, MDP, max_iter=2000, random=False, render=False):
 
     error = 0
 
-    observation = MDP.reset()
+    observation = MDP.reset(state_start)
     reward_episode = 0
     nb = 0
     done = False
