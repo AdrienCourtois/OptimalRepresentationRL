@@ -10,13 +10,15 @@ class Model(nn.Module):
         self.n_hidden = n_hidden
 
         self.fc1 = nn.Linear(self.MDP.n_states, self.n_hidden)
-        self.fc2 = nn.Linear(self.n_hidden, 1)
+        self.fc2 = nn.Linear(self.n_hidden, 100)
+        self.fc3 = nn.Linear(100, 1)
 
         self.optim = torch.optim.Adam(self.parameters())
     
     def forward(self, x):
         x = F.relu(self.fc1(x))
-        x = self.fc2(x)
+        x = F.leaky_relu(self.fc2(x))
+        x = self.fc3(x)
 
         return x
 
