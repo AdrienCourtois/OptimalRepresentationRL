@@ -43,8 +43,7 @@ class AVFManager:
             for x in range(self.MDP.n_states):
                 P[:, x] = self.MDP.P[x, pi[x], :]
         else:
-            for x in range(self.MDP.n_states):
-                P[x] = torch.sum(pi * self.MDP.P[:,:,x], 1)
+            P = (pi[:,:,None] * self.MDP.P).sum(1).t()
         
         return P
 
@@ -244,6 +243,7 @@ class AVFManager:
         
         for i in range(n,n+k):
             self.AVFs.append(algo(self.deltas[i], **kargs))
+            print("Done", i-n)
     
     def __getitem__(self, idx):
         # Returns the asked AVF
