@@ -210,3 +210,28 @@ wwwwwwwwwwwww
             rewards.append(reward)
         
         return nb_errors, rewards
+
+    def sample(self, n):
+        states = np.zeros((n,), dtype=np.int)
+        rewards = np.zeros((n, self.n_actions), dtype=np.float)
+        next_states = np.zeros((n, self.n_actions), dtype=np.int)
+
+        for i in range(n):
+            # Sample states
+            rd = np.random.randint(0, self.n_states)
+
+            while rd in self.forbidden_states:
+                rd = np.random.randint(0, self.n_states)
+
+            states[i] = rd
+
+            # Sample reward, next_state
+            self.reset(s=rd)
+
+            for a in range(self.n_actions):
+                next_state, reward, _, _ = self.step(a)
+            
+                rewards[i][a] = reward
+                next_states[i][a] = next_state
+            
+        return states, rewards, next_states
