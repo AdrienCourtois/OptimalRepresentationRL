@@ -13,7 +13,7 @@ class Model(nn.Module):
         self.fc2 = nn.Linear(self.n_hidden, 100)
         self.fc3 = nn.Linear(100, 1)
 
-        self.optim = torch.optim.Adam(self.parameters())
+        self.optim = torch.optim.Adam(self.parameters(), lr=1e-4)
     
     def forward(self, x):
         x = F.relu(self.fc1(x))
