@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+import numpy as np
 from models.CEVIMModel import CEVIMModel
 
 def CEVIM(MDP, n_iter=500, K=100, n_out=100, verbose=False):
