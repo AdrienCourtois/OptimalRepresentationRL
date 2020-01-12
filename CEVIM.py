@@ -4,13 +4,14 @@ from models.CEVIMModel import CEVIMModel
 
 def CEVIM(MDP, n_iter=500, K=100, verbose=False):
     # Recording
-
     losses_bellman = []
     losses_cum = []
 
     # Model definition
     alphas = (1-MDP.gamma) * np.power(MDP.gamma, np.arange(K-2, -2, -1)) / (1 - MDP.gamma ** (K+1))
     model = CEVIMModel(MDP)
+
+    r = torch.from_numpy(MDP.R).mean(2)
 
     # Algorithm
     for i in range(n_iter):
