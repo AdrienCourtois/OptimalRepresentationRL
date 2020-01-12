@@ -1,8 +1,9 @@
 import torch
 import torch.nn as nn
+import torch.nn.functional as F
 
 class AVFRepresentation(nn.Module):
-    def __init__(self, MDP, d=16):
+    def __init__(self, MDP, d=100):
         super(AVFRepresentation, self).__init__()
         
         self.MDP = MDP
@@ -18,3 +19,12 @@ class AVFRepresentation(nn.Module):
         x = self.fc2(x)
 
         return x
+    
+    def load(self, path):
+        temp = torch.load(path)
+
+        self.fc1.weight.value = temp['fc1.weight']
+        self.fc1.bias.value = temp['fc1.bias']
+
+        self.fc2.weight.value = temp['fc2.weight']
+        self.fc2.bias.value = temp['fc2.bias']
