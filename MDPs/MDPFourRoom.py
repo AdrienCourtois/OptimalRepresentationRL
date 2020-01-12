@@ -212,9 +212,9 @@ wwwwwwwwwwwww
         return nb_errors, rewards
 
     def sample(self, n):
-        states = torch.zeros(n, dtype=torch.int)
+        states = torch.zeros(n, dtype=torch.long)
         rewards = torch.zeros(n, self.n_actions, dtype=torch.float)
-        next_states = torch.zeros(n, self.n_actions, dtype=torch.int)
+        next_states = torch.zeros(n, self.n_actions, dtype=torch.long)
 
         for i in range(n):
             # Sample states
