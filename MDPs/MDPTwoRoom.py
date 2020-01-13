@@ -54,6 +54,12 @@ class MDPTwoRoom:
             self.P[x,3,:] = 0
             self.P[x,3,x] = 1
         
+        for x in range(self.n_states):
+            for a in range(self.n_actions):
+                if self.P[x,a].argmax() in self.forbidden_states:
+                    self.P[x,a,self.P[x,a].argmax()] = 0
+                    self.P[x,a,x] = 1
+
         # End state
         self.P[self.end_state] = np.zeros((self.n_actions, self.n_states))
         self.P[self.end_state,:,self.end_state] = 1
@@ -87,7 +93,7 @@ class MDPTwoRoom:
         reward = self.R[self.state, action, next_state]
 
         # Checking if it is done
-        done = next_state == self.end_state or next_state in self.forbidden_states or self.nb_actions >= 200
+        done = next_state == self.end_state or next_state in self.forbidden_states
 
         # Internal updates
         self.state = next_state
