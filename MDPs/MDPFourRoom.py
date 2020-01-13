@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import sys
-from utils.evaluate_V import evaluate_V
+from utils.evaluate_policy import evaluate_policy
 
 def make_adjacency(layout):
     """Convert a grid world layout to an adjacency matrix.
@@ -196,7 +196,7 @@ wwwwwwwwwwwww
 
         return self
     
-    def evaluate(self, V):
+    def evaluate(self, pi):
         rewards = []
         nb_errors = 0
 
@@ -204,7 +204,7 @@ wwwwwwwwwwwww
             if i in self.forbidden_states:
                 continue
             
-            error, reward = evaluate_V(V, self, state_start=i)
+            error, reward = evaluate_policy(pi, self, state_start=i)
 
             nb_errors += error
             rewards.append(reward)
