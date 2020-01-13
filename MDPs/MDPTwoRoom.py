@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import sys
-from utils.evaluate_V import evaluate_V
+from utils.evaluate_policy import evaluate_policy
 
 class MDPTwoRoom:
     def __init__(self):
@@ -9,7 +9,7 @@ class MDPTwoRoom:
         # 9  10 11 12 x  14 15 16 17
         # 18 19 20 21 22 23 24 25 26
         # 27 28 29 30 x  32 33 34 35  
-        # 36 37 38 39 x  41 42 43 44 (45) 
+        # 36 37 38 39 x  41 42 43 44
 
         self.desc = np.array([[" ", " ", " ", " ", "x", " ", " ", " ", " "],
                              [" ", " ", " ", " ", "x", " ", " ", " ", " "],
@@ -21,10 +21,9 @@ class MDPTwoRoom:
         self.n_cols = 9
         self.begin_state = 36
         self.end_state = 44
-        self.dump_state = 45
         self.forbidden_states = [4, 13, 31, 40]
 
-        self.n_states = 46
+        self.n_states = 45
         self.n_actions = 4 # 0: left, 1: right, 2: top, 3: bottom
         self.gamma = 0.99
 
@@ -41,28 +40,21 @@ class MDPTwoRoom:
         # Out of bound
         for x in [0, 5, 9, 14, 18, 27, 32, 36, 41]:
             self.P[x,0,:] = 0
-            self.P[x,0,self.dump_state] = 1
-            #self.R[x,0,:] = -1
+            self.P[x,0,x] = 1
         
         for x in [3, 8, 12, 17, 26, 30, 35, 39, 44]:
             self.P[x,1,:] = 0
-            self.P[x,1,self.dump_state] = 1
-            #self.R[x,1,:] = -1
+            self.P[x,1,x] = 1
 
         for x in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 22]:
             self.P[x,2,:] = 0
-            self.P[x,2,self.dump_state] = 1
-            #self.R[x,2,:] = -1
+            self.P[x,2,x] = 1
         
         for x in [22, 36, 37, 38, 39, 40, 41, 42, 43, 44]:
             self.P[x,3,:] = 0
-            self.P[x,3,self.dump_state] = 1
-            #self.R[x,3,:] = -1
+            self.P[x,3,x] = 1
         
-        # Dump
-        self.P[self.dump_state] = np.zeros((self.n_actions, self.n_states))
-        self.P[self.dump_state,:,self.dump_state] = 1
-
+        # End state
         self.P[self.end_state] = np.zeros((self.n_actions, self.n_states))
         self.P[self.end_state,:,self.end_state] = 1
         
@@ -140,17 +132,42 @@ class MDPTwoRoom:
 
         return self
     
-    def evaluate(self, V):
+    def evaluate(self, pi):
         rewards = []
         nb_errors = 0
 
         for i in range(self.n_states):
-            if i in self.forbidden_states or i == self.dump_state:
+            if i in self.forbidden_states:
                 continue
             
-            error, reward = evaluate_V(V, self, state_start=i)
+            error, reward = evaluate_policy(pi, self, state_start=i)
 
             nb_errors += error
             rewards.append(reward)
         
         return nb_errors, rewards
+
+    def sample(self, n):
+        states = torch.zeros(n, dtype=torch.long)
+        rewards = torch.zeros(n, self.n_actions, dtype=torch.float)
+        next_states = torch.zeros(n, self.n_actions, dtype=torch.long)
+
+        for i in range(n):
+            # Sample states
+            rd = np.random.randint(0, self.n_states)
+
+            while rd in self.forbidden_states:
+                rd = np.random.randint(0, self.n_states)
+
+            states[i] = rd
+
+            # Sample reward, next_state
+            self.reset(s=rd)
+
+            for a in range(self.n_actions):
+                next_state, reward, _, _ = self.step(a)
+            
+                rewards[i][a] = reward
+                next_states[i][a] = next_state
+            
+        return states, rewards, next_states
