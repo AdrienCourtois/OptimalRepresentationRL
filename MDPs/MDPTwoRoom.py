@@ -114,10 +114,10 @@ class MDPTwoRoom:
     def render(self):
         outfile = sys.stdout
 
-        out = MDP.desc.copy()
+        out = self.desc.copy()
         out_test = np.zeros(out.shape)
         out_test[out != "x"] = np.arange(out[out != "x"].size)
-        out[(out != "x") & (out_test == MDP.state)] = "H"
+        out[(out != "x") & (out_test == self.state)] = "H"
 
         outfile.write("---------\n")
         outfile.write("\n".join(["".join(row) for row in out]) + "\n")
