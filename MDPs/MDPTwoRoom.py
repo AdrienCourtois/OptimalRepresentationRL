@@ -114,14 +114,8 @@ class MDPTwoRoom:
     def render(self):
         outfile = sys.stdout
 
-        out = self.desc.copy().tolist()
-        out = [[c for c in line] for line in out]
-        r, c = int(self.state / self.n_cols), int(self.state % self.n_cols)
-
-        def ul(x):
-            return "_" if x == " " else x
-        
-        out[r][c] = "H"
+        out = self.desc.copy()
+        out[out != "x"][self.state] = "H"
 
         outfile.write("---------\n")
         outfile.write("\n".join(["".join(row) for row in out]) + "\n")
