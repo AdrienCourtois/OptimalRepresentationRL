@@ -96,7 +96,7 @@ class MDPTwoRoom:
         done = next_state == self.end_state
 
         # Internal updates
-        self.state = next_state
+        self.state = next_state.item()
 
         if done:
             self.reset()
