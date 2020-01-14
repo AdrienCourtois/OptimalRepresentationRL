@@ -5,11 +5,11 @@ from utils.evaluate_policy import evaluate_policy
 
 class MDPTwoRoom:
     def __init__(self):
-        # 0  1  2  3  x  5  6  7  8
-        # 9  10 11 12 x  14 15 16 17
-        # 18 19 20 21 22 23 24 25 26
-        # 27 28 29 30 x  32 33 34 35  
-        # 36 37 38 39 x  41 42 43 44
+        # 0  1  2  3  x  4  5  6  7
+        # 8  9  10 11 x 12 13 14 15
+        # 16 17 18 19 20 21 22 23 24
+        # 25 26 27 28 x  29 30 31 32
+        # 33 34 35 36 x  37 38 39 40
 
         self.desc = np.array([[" ", " ", " ", " ", "x", " ", " ", " ", " "],
                              [" ", " ", " ", " ", "x", " ", " ", " ", " "],
@@ -19,11 +19,10 @@ class MDPTwoRoom:
 
         self.n_rows = 5
         self.n_cols = 9
-        self.begin_state = 36
-        self.end_state = 44
-        self.forbidden_states = [4, 13, 31, 40]
+        self.begin_state = 33
+        self.end_state = 40
 
-        self.n_states = 45
+        self.n_states = 41
         self.n_actions = 4 # 0: left, 1: right, 2: top, 3: bottom
         self.gamma = 0.99
 
@@ -38,35 +37,29 @@ class MDPTwoRoom:
             self.P[s,3,(s+self.n_cols) % self.n_states] = 1
         
         # Out of bound
-        for x in [0, 5, 9, 14, 18, 27, 32, 36, 41]:
+        for x in [0, 4, 8, 12, 16, 25, 29, 33, 37]: # LEFT
             self.P[x,0,:] = 0
             self.P[x,0,x] = 1
         
-        for x in [3, 8, 12, 17, 26, 30, 35, 39, 44]:
+        for x in [3, 7, 11, 15, 24, 28, 32, 36, 40]: # RIGHT
             self.P[x,1,:] = 0
             self.P[x,1,x] = 1
 
-        for x in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 22]:
+        for x in [0, 1, 2, 3, 4, 5, 6, 7, 20]: # TOP
             self.P[x,2,:] = 0
             self.P[x,2,x] = 1
         
-        for x in [22, 36, 37, 38, 39, 40, 41, 42, 43, 44]:
+        for x in [20, 33, 34, 35, 36, 37, 38, 39, 40]: # BOTTOM
             self.P[x,3,:] = 0
             self.P[x,3,x] = 1
-        
-        for x in range(self.n_states):
-            for a in range(self.n_actions):
-                if self.P[x,a].argmax() in self.forbidden_states:
-                    self.P[x,a,self.P[x,a].argmax()] = 0
-                    self.P[x,a,x] = 1
 
         # End state
         self.P[self.end_state] = np.zeros((self.n_actions, self.n_states))
         self.P[self.end_state,:,self.end_state] = 1
         
         # R definition
-        self.R[43,1,:] = 1 # qd tu vas à droite à partir de la case 43, c'est bien
-        self.R[35,3,:] = 1 # qd tu vas en bas à partir de la case 35 c'est bien
+        self.R[39,1,:] = 1 # qd tu vas à droite à partir de la case 39, c'est bien
+        self.R[32,3,:] = 1 # qd tu vas en bas à partir de la case 35 c'est bien
         #self.R[self.end_state,:,:] = 1
         
         self.P = torch.from_numpy(self.P).float()
@@ -77,7 +70,6 @@ class MDPTwoRoom:
 
         # transition
         self.state = self.begin_state
-        self.nb_actions = 0
         
         self.is_cuda = False
     
@@ -93,11 +85,10 @@ class MDPTwoRoom:
         reward = self.R[self.state, action, next_state]
 
         # Checking if it is done
-        done = next_state == self.end_state or next_state in self.forbidden_states
+        done = next_state == self.end_state
 
         # Internal updates
         self.state = next_state
-        self.nb_actions += 1
 
         if done:
             self.reset()
@@ -109,8 +100,6 @@ class MDPTwoRoom:
             self.state = self.begin_state
         else:
             self.state = s
-        
-        self.nb_actions = 0
         
         return self.state
     
@@ -143,9 +132,6 @@ class MDPTwoRoom:
         nb_errors = 0
 
         for i in range(self.n_states):
-            if i in self.forbidden_states:
-                continue
-            
             error, reward = evaluate_policy(pi, self, state_start=i)
 
             nb_errors += error
@@ -161,10 +147,6 @@ class MDPTwoRoom:
         for i in range(n):
             # Sample states
             rd = np.random.randint(0, self.n_states)
-
-            while rd in self.forbidden_states:
-                rd = np.random.randint(0, self.n_states)
-
             states[i] = rd
 
             # Sample reward, next_state
