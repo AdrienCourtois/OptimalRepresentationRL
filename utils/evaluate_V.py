@@ -1,7 +1,7 @@
 import torch
 
 def evaluate_V(V, MDP, state_start=None, max_iter=2000, random=False, render=False):
-    r = torch.from_numpy(MDP.R).mean(2)
+    r = (torch.from_numpy(MDP.R) * MDP.P).sum(2)
 
     # Compute policy
     Q = (r + MDP.gamma * (MDP.P * V[None,None]).sum(2))
