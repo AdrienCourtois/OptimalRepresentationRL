@@ -18,7 +18,7 @@ class MDPTwoRoom:
                              ["S", " ", " ", " ", "x", " ", " ", " ", "G"]])
 
         self.n_rows = 5
-        self.n_cols = 9
+        self.n_cols = 8
         self.begin_state = 33
         self.end_state = 40
 
@@ -33,8 +33,16 @@ class MDPTwoRoom:
         for s in range(self.n_states):
             self.P[s,0,(s-1) % self.n_states] = 1
             self.P[s,1,(s+1) % self.n_states] = 1
-            self.P[s,2,(s-self.n_cols) % self.n_states] = 1
-            self.P[s,3,(s+self.n_cols) % self.n_states] = 1
+
+            if 21 <= s <= 28:
+                self.P[s,2,(s-self.n_cols-1) % self.n_states] = 1
+            else:
+                self.P[s,2,(s-self.n_cols) % self.n_states] = 1
+
+            if 12 <= s <= 19:
+                self.P[s,3,(s+self.n_cols+1) % self.n_states] = 1
+            else:
+                self.P[s,3,(s+self.n_cols) % self.n_states] = 1
         
         # Out of bound
         for x in [0, 4, 8, 12, 16, 25, 29, 33, 37]: # LEFT
