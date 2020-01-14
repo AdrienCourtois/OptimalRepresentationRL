@@ -154,9 +154,8 @@ class MDPTwoRoom:
             states[i] = rd
 
             # Sample reward, next_state
-            self.reset(s=rd)
-
             for a in range(self.n_actions):
+                self.reset(s=rd)
                 next_state, reward, _, _ = self.step(a)
             
                 rewards[i][a] = reward
