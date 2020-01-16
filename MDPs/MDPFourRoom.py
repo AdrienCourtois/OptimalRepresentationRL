@@ -158,20 +158,20 @@ wwwwwwwwwwwww
 
         return self
     
-    def evaluate(self, pi):
+    def evaluate(self, pi, max_iter=500):
         rewards = []
         nb_errors = 0
 
         for i in range(self.n_states):
-            error, reward = evaluate_policy(pi, self, state_start=i)
+            error, reward = evaluate_policy(pi, self, state_start=i, max_iter=max_iter)
 
             nb_errors += error
             rewards.append(reward)
         
         return nb_errors, rewards
     
-    def evaluate_start(self, pi):
-        error, reward = evaluate_policy(pi, self, max_iter=500)
+    def evaluate_start(self, pi, max_iter=500):
+        error, reward = evaluate_policy(pi, self, max_iter=max_iter)
 
         return error, reward
 
