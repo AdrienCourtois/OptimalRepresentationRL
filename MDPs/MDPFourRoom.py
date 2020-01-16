@@ -169,6 +169,11 @@ wwwwwwwwwwwww
             rewards.append(reward)
         
         return nb_errors, rewards
+    
+    def evaluate_start(self, pi):
+        error, reward = evaluate_policy(pi, self, max_iter=500)
+
+        return error, reward
 
     def sample(self, n):
         states = torch.zeros(n, dtype=torch.long)
